@@ -36,6 +36,7 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "Liberation Mono" :foundry "outline" :slant normal :weight normal :height 120 :width normal)))))
 
+;; activate fullscreen
 (toggle-frame-fullscreen)
 
 ;; first screen (empty buffer)
@@ -51,6 +52,9 @@
 	(other-window 1))))
 
 (start_up_screen)
+
+;; set default directory to c++ folder
+(setq default-directory "D:/Programming/c&cpp/cpp" )
 
 ;; theme
 (setq custom--inhibit-theme-enable nil)
@@ -213,7 +217,7 @@
 (defun delete-if0 ()
   (interactive)
   (if (search-forward "#if 0" nil t)
-      (progn 
+      (progn
 	(kill-whole-line)
 	(if (search-forward "#endif" nil t)
 	    (kill-whole-line)))))
@@ -290,7 +294,7 @@
   (if (find-project-directory) (compile "generate.bat"))
   (other-window 1))
 
-;; always kill *compilation* buffer before new *compilation* start 
+;; always kill *compilation* buffer before new *compilation* start
 (setq compilation-always-kill t)
 
 (define-key global-map (kbd "<f1>") 'build)
@@ -300,7 +304,7 @@
 (setq auto-mode-alist
       (append
        '(("\\.cpp$"    . c++-mode)
-      ;;   ("\\.glsl$"    . c++-mode)	 
+	 ;;   ("\\.glsl$"    . c++-mode)
          ("\\.h$"    . c++-mode)
          ("\\.c$"   . c++-mode)
 	 ) auto-mode-alist))
@@ -356,7 +360,4 @@
 (setq next-line-add-newlines t)
 
 (global-set-key (kbd "M-o") 'other-window)
-
 (global-set-key (kbd "M-w") 'copy-region-as-kill)
-
-
