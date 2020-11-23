@@ -1,3 +1,6 @@
+(setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
+      gc-cons-percentage 0.6)
+
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
@@ -9,22 +12,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(blink-cursor-mode nil)
- '(column-number-mode t)
- '(custom-safe-themes
-   '("2391f1bf535aae3db84ef590305142f9b9e591f5d6fb923aa39a8cbe7a9ee602" "d138755a2e3f917ecf0fd0bb4ef89b392c306919d537cef40e8acd22a171988b" "4a042157f7dd2c602f0da4f8dbc2c7216729f60005682931ca406a07d87c3511" "5d69322a2fb105a8a49fc4a15611c91c2e8ea502197c105ed26cfa2907d3dddb" "ddcb8be019592c6721c9baadb5727d3f7308b3321326ac101787a24235ddfc59" "1de65986faa8c92ab070847c84c2ef131c82ccf7b3b8aa48d51c32faead52f2a" "687c29c8038e9a2d489266f5dfe42c3d36cb36ccac0d1d3fb96b9d3d47b7734f" "2809bcb77ad21312897b541134981282dc455ccd7c14d74cc333b6e549b824f3" "a10b37a83ca21e6b6a5cf9df0a20f1d128215ea22ef027f9ca44eacd944e952a" "6ea6396c0c630a9bd0119272a65d23f3c1d26d0682d6d6afb94171dab6f2863a" "6b85a69a062d0f61bdb02cb52fc7f3b74ecd7411b3fb27da1197ea728ee65093" "16d30b775ec4db2059a22a4def1589b318c20fb6f8472fda11f40a2b1597b83d" "86446f04dabe3535be0b3df45858b0d7d186c6bfdb4b0dd0936974349acac25c" "471a03414a2b4a9a078cc4f238420f4dc62fcb54f2532ac4c0d2cbbee87b46c5" "92cc4e4fbaa7ded0e4a69da1053641e32596cc0d7a21f39d52831f36712e9cae" "d89a9f942d46ec530c0707012dada7c12ac5e90a1211ab2e7148697f12b5a9e4" "0bb2a727e7a864f44b52698ee6fc9f7d3ba91e417f4bfa92b94ea420fa6ad239" "9e7d1b5db92c52b5687d05c170246ae1299f23ea5d116013ba4024edbf0d8326" "bc3af5405366794ed35266bf7b8b3579d25b47f5049f4aa2fc1c5d374ecdcda0" "47527ddad3855912c81322bbb62bd8dbad69f2f9a4967afb002c5715dd852dd0" "5d59bd44c5a875566348fa44ee01c98c1d72369dc531c1c5458b0864841f887c" default))
- '(display-line-numbers-type nil)
- '(electric-pair-mode t)
- '(fringe-mode '(1 . 1) nil (fringe))
- '(global-display-line-numbers-mode t)
- '(linum-format " %5i ")
- '(menu-bar-mode nil)
  '(package-selected-packages
-   '(smartscan glsl-mode aggressive-indent highlight-numbers rainbow-delimiters buffer-move naysayer-theme))
+   '(smartscan rainbow-delimiters naysayer-theme highlight-numbers glsl-mode gcmh buffer-move aggressive-indent))
+ '(fringe-mode '(1 . 1) nil (fringe))
  '(rainbow-delimiters-max-face-count 1)
- '(scroll-bar-mode nil)
- '(tool-bar-mode nil)
- '(tooltip-mode nil)
  '(window-divider-default-bottom-width 1)
  '(window-divider-default-places t)
  '(window-divider-default-right-width 1)
@@ -34,15 +25,74 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Liberation Mono" :foundry "outline" :slant normal :weight normal :height 120 :width normal)))))
+ ;; '(default ((t (:family "Liberation Mono" :height 120)))))
+ )
 
-;; activate fullscreen
-(toggle-frame-fullscreen)
+(gcmh-mode 1)
+(menu-bar-mode 0)
+(scroll-bar-mode 0)
+(tool-bar-mode 0)
+(tooltip-mode 0)
+(blink-cursor-mode 0)
+(global-display-line-numbers-mode 0)
+(column-number-mode 1)
+(icomplete-mode 1)
+(electric-pair-mode 1)
+(global-visual-line-mode 1)
+(global-hl-line-mode 1)
+(global-smartscan-mode 1)
+(add-hook 'prog-mode-hook 'highlight-numbers-mode)
 
-;; first screen (empty buffer)
-(defun start_up_screen ()
+(run-with-idle-timer 0.2 nil (lambda ()
+			       (ido-mode 1)
+			       (setq ido-enable-flex-matching t)
+			       (setq ido-everywhere t)))
+
+(setq file-name-handler-alist nil)
+
+(setq frame-inhibit-implied-resize t)
+
+(add-to-list 'default-frame-alist '(font . "Liberation Mono-12"))
+
+;; force emacs for utf-8
+(set-language-environment "UTF-8")
+(prefer-coding-system 'utf-8)
+;;(modify-coding-system-alist 'file "" 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(setq coding-system-for-read 'utf-8)
+(setq coding-system-for-write 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8) 
+;; backwards compatibility as default-buffer-file-coding-system
+;; is deprecated in 23.2.
+(if (boundp 'buffer-file-coding-system)
+    (setq-default buffer-file-coding-system 'utf-8)
+  (setq default-buffer-file-coding-system 'utf-8))
+
+;; Treat clipboard input as UTF-8 string first; compound text next, etc.
+(setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
+
+;; set default directory to c++ folder
+(setq default-directory "D:/Programming/c&cpp/cpp" )
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs ready in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
+;; theme
+(setq custom--inhibit-theme-enable nil)
+(load-theme 'naysayer t)
+
+;; activate fullscreen, open empty buffer and init.el
+(defun start-up-screen ()
   (if (< (count-windows) 2)
       (progn
+	(toggle-frame-fullscreen)
 	(setq inhibit-splash-screen 'my-start-screen)
 	(switch-to-buffer "*scratch*")
 	(setq initial-scratch-message nil)
@@ -51,29 +101,23 @@
 	(find-file "~/.emacs.d/init.el")
 	(other-window 1))))
 
-(start_up_screen)
+(start-up-screen)
 
-;; set default directory to c++ folder
-(setq default-directory "D:/Programming/c&cpp/cpp" )
-
-;; theme
-(setq custom--inhibit-theme-enable nil)
-(load-theme 'naysayer t)
 ;; parens
 (custom-theme-set-faces
  'naysayer ;; e.g. 'spacemacs-dark
  '(show-paren-match ((t (:foreground "#ae81ff" :background "#0b3335")))) ;; colors from theme
- '(show-paren-mismatch ((t (:foreground nil :background nil))))) ;; disable show-paren-mismatch to use rainbow-delimeter mismatching parens
+ '(show-paren-mismatch ((t (:foreground nil :background nil))))) ;; disable set show-paren-mismatch nil to use rainbow-delimeter mismatching parens
 (show-paren-mode 1)
 (setq show-paren-delay 0)
 
 ;; rainbow-delimeter for mismatching parens
-(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-(require 'rainbow-delimiters)
-(set-face-attribute 'rainbow-delimiters-unmatched-face nil
-                    :foreground "#88090b"
-                    :inherit 'error)
+;;(require 'rainbow-delimiters)
+;; (set-face-attribute 'rainbow-delimiters-unmatched-face nil
+;;                     :foreground "#88090b"
+;;                     :inherit 'error)
 
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 ;; set rainbow-delimiters to not highlight < and >
 (defun my-rainbow-delimiters-face (depth match loc)
   (unless (memq (char-after loc) '(?\< ?\>))
@@ -86,17 +130,6 @@
 (global-set-key (kbd "<C-S-down>")   'buf-move-down)
 (global-set-key (kbd "<C-S-left>")   'buf-move-left)
 (global-set-key (kbd "<C-S-right>")  'buf-move-right)
-
-(blink-cursor-mode 0)
-(icomplete-mode 1)
-(setq ido-enable-flex-matching t)
-(setq ido-everywhere t)
-(ido-mode 1)
-(electric-pair-mode 1)
-(global-visual-line-mode 1)
-(global-hl-line-mode 1)
-(global-smartscan-mode 1)
-(add-hook 'prog-mode-hook 'highlight-numbers-mode)
 
 ;; change window split orientation (horizontal to vertical or opposite)
 (defun toggle-window-split ()
@@ -297,6 +330,35 @@
 ;; always kill *compilation* buffer before new *compilation* start
 (setq compilation-always-kill t)
 
+(setq project-files-loaded nil)
+
+(defun lock-project-directory ()
+  (interactive)
+  (setq project-files-loaded t)
+  (message "Project directory is locked."))
+
+(defun unlock-project-directory ()
+  (interactive)
+  (setq project-files-loaded nil)
+  (message "Project directory is unlocked."))
+
+(defun load-project-files ()
+  (interactive)
+  (if (not project-files-loaded)
+      (progn
+	(other-window 1)
+	(setq other-window-buffer (buffer-name))
+	(other-window 1)
+	(if (find-project-directory)
+	    (progn
+	      (setq project-files-loaded t)
+	      (setq project-root-directory default-directory)
+	      (mapc #'find-file (directory-files-recursively project-root-directory "\\(\\.glsl$\\|\\.cpp$\\|\\.h$\\|\\.c$\\)" nil))
+	      (switch-to-buffer other-window-buffer)
+	      (other-window 1)
+	      (message "Project files have been loaded."))))
+    (message "Project files have already been loaded.")))
+
 (define-key global-map (kbd "<f1>") 'build)
 (define-key global-map (kbd "<f2>") 'run)
 (define-key global-map (kbd "<f3>") 'generate)
@@ -308,30 +370,6 @@
          ("\\.h$"    . c++-mode)
          ("\\.c$"   . c++-mode)
 	 ) auto-mode-alist))
-
-(setq project-locked nil)
-
-(defun load-project-files ()
-  (interactive)
-  (if (not project-locked)
-      (progn
-	(other-window 1)
-	(setq other-window-buffer (buffer-name))
-	(other-window 1)
-	(if (find-project-directory)
-	    (progn
-	      (setq project-locked t)
-	      (setq project-root-directory default-directory)
-	      (mapc #'find-file (directory-files-recursively project-root-directory "\\(\\.glsl$\\|\\.cpp$\\|\\.h$\\|\\.c$\\)" nil))
-	      (switch-to-buffer other-window-buffer)
-	      (other-window 1)
-	      (message "Project files have been loaded."))))
-    (message "Project files have already been loaded.")))
-
-
-(global-set-key (kbd "C-w") 'backward-kill-word) ;; default C-<backspace>
-(global-set-key (kbd "C-c d") 'kill-region) ;; default C-w
-
 
 (defun push-mark-no-activate ()
   "Pushes `point' to `mark-ring' and does not activate the region
@@ -359,5 +397,22 @@
 ;; C-n adds new line if it is end of the buffer
 (setq next-line-add-newlines t)
 
-(global-set-key (kbd "M-o") 'other-window)
+(global-set-key (kbd "M-o") 'other-window) ;; default C-x o
 (global-set-key (kbd "M-w") 'copy-region-as-kill)
+
+;; Replace C-a and M-m
+(global-set-key (kbd "C-a") 'back-to-indentation)
+(global-set-key (kbd "M-m") 'beginning-of-visual-line)
+
+(global-set-key (kbd "M-h") 'backward-kill-word) ;; default C-<backspace>
+(global-set-key (kbd "C-h") 'backward-delete-char)
+;;(global-set-key (kbd "C-c d") 'kill-region) ;; default C-w
+
+(global-set-key (kbd "C-?") 'help-command) ;; default C-h
+
+;; enlarge and shrink window
+(global-set-key (kbd "M-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "M-<left>") 'shrink-window-horizontally)
+
+(setq gc-cons-threshold 16777216 ; 16mb
+      gc-cons-percentage 0.1)
