@@ -12,9 +12,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(smartscan rainbow-delimiters naysayer-theme highlight-numbers glsl-mode gcmh buffer-move aggressive-indent))
  '(fringe-mode '(1 . 1) nil (fringe))
+ '(package-selected-packages
+   '(writeroom-mode smartscan rainbow-delimiters naysayer-theme highlight-numbers glsl-mode gcmh buffer-move aggressive-indent))
  '(rainbow-delimiters-max-face-count 1)
  '(window-divider-default-bottom-width 1)
  '(window-divider-default-places t)
@@ -25,7 +25,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- ;; '(default ((t (:family "Liberation Mono" :height 120)))))
  )
 
 (gcmh-mode 1)
@@ -212,13 +211,24 @@
   (setq c++-tab-always-indent t)
   (setq c-basic-offset 4)                  ;; Default is 2
   (setq c-indent-level 4)                  ;; Default is 2
-
+  
   (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
   (setq tab-width 4)
   (setq indent-tabs-mode t)  ; use spaces only if nil
   )
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+
+(add-hook
+ 'c++-mode-hook
+ (lambda ()
+   ;; C-c C-c comment region (in c++ mode) (already defined)
+   ;; C-c C-v uncomment region (in c++ mode)
+   (local-set-key (kbd "C-c C-v") #'uncomment-region)
+   ;; ***_API keywords will be like noise macros (ex. __declspec(dllexport))
+   ;; for correct indentation
+   (setq c-noise-macro-names "[A-Z_]+_API")
+   ))
 
 ;; disable auto save mode
 (setq auto-save-default nil)
@@ -387,13 +397,6 @@
   (set-mark-command 1))
 (global-set-key (kbd "M-\"") 'jump-to-mark)
 
-;; C-c C-c comment region (in c++ mode) (already defined)
-;; C-c C-v uncomment region (in c++ mode)
-(add-hook
- 'c++-mode-hook
- (lambda ()
-   (local-set-key (kbd "C-c C-v") #'uncomment-region)))
-
 ;; C-n adds new line if it is end of the buffer
 (setq next-line-add-newlines t)
 
@@ -413,6 +416,10 @@
 ;; enlarge and shrink window
 (global-set-key (kbd "M-<right>") 'enlarge-window-horizontally)
 (global-set-key (kbd "M-<left>") 'shrink-window-horizontally)
+
+;; HideShow minor mode
+(add-hook 'c-mode-common-hook 'hs-minor-mode)
+(global-set-key (kbd "C-+") 'hs-toggle-hiding)
 
 (setq gc-cons-threshold 16777216 ; 16mb
       gc-cons-percentage 0.1)
