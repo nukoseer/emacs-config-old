@@ -12,14 +12,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(fringe-mode '(1 . 1) nil (fringe))
+ ;; '(fringe-mode '(0 . 0) nil (fringe))
+ '(linum-format " %5i ")
  '(package-selected-packages
    '(writeroom-mode smartscan rainbow-delimiters naysayer-theme highlight-numbers glsl-mode gcmh buffer-move aggressive-indent))
  '(rainbow-delimiters-max-face-count 1)
- '(window-divider-default-bottom-width 1)
- '(window-divider-default-places t)
- '(window-divider-default-right-width 1)
- '(window-divider-mode t))
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -27,7 +25,10 @@
  ;; If there is more than one, they won't work right.
  )
 
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+
 (gcmh-mode 1)
+(window-divider-mode 1)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
@@ -47,11 +48,22 @@
 			       (setq ido-enable-flex-matching t)
 			       (setq ido-everywhere t)))
 
-(setq file-name-handler-alist nil)
+(setq window-divider-default-right-width 12)
+(setq window-divider-default-places 'right-only)
 
+;; no ugly button for checkboxes
+(setq widget-image-enable nil)
+
+(setq file-name-handler-alist nil)
 (setq frame-inhibit-implied-resize t)
 
-(add-to-list 'default-frame-alist '(font . "Liberation Mono-12"))
+(setq default-frame-alist
+      (append (list
+	       '(font . "Liberation Mono-12")
+	       '(internal-border-width . 12)
+	       '(left-fringe  . 0)
+               '(right-fringe . 0))))
+
 
 ;; force emacs for utf-8
 (set-language-environment "UTF-8")
@@ -85,7 +97,7 @@
 
 ;; theme
 (setq custom--inhibit-theme-enable nil)
-(load-theme 'naysayer t)
+(load-theme 'nano t)
 
 ;; activate fullscreen, open empty buffer and init.el
 (defun start-up-screen ()
@@ -102,19 +114,8 @@
 
 (start-up-screen)
 
-;; parens
-(custom-theme-set-faces
- 'naysayer ;; e.g. 'spacemacs-dark
- '(show-paren-match ((t (:foreground "#ae81ff" :background "#0b3335")))) ;; colors from theme
- '(show-paren-mismatch ((t (:foreground nil :background nil))))) ;; disable set show-paren-mismatch nil to use rainbow-delimeter mismatching parens
 (show-paren-mode 1)
 (setq show-paren-delay 0)
-
-;; rainbow-delimeter for mismatching parens
-;;(require 'rainbow-delimiters)
-;; (set-face-attribute 'rainbow-delimiters-unmatched-face nil
-;;                     :foreground "#88090b"
-;;                     :inherit 'error)
 
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 ;; set rainbow-delimiters to not highlight < and >
@@ -211,6 +212,7 @@
   (setq c++-tab-always-indent t)
   (setq c-basic-offset 4)                  ;; Default is 2
   (setq c-indent-level 4)                  ;; Default is 2
+  ;;(setq c-set-offset 'case-label 0)       ;; for switch-case
   
   (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
   (setq tab-width 4)
@@ -226,8 +228,8 @@
    ;; C-c C-v uncomment region (in c++ mode)
    (local-set-key (kbd "C-c C-v") #'uncomment-region)
    ;; ***_API keywords will be like noise macros (ex. __declspec(dllexport))
-   ;; for correct indentation
-   (setq c-noise-macro-names "[A-Z_]+_API")
+   ;; for correct indentation 
+   (setq c-noise-macro-names "[A-Z_]+_API")   
    ))
 
 ;; disable auto save mode
@@ -420,6 +422,21 @@
 ;; HideShow minor mode
 (add-hook 'c-mode-common-hook 'hs-minor-mode)
 (global-set-key (kbd "C-+") 'hs-toggle-hiding)
+
+;; (setq magit-refresh-status-buffer nil)
+;; (setq magit-commit-show-diff nil
+;;       magit-revert-buffers 1)
+
+;; (setq auto-revert-buffer-list-filter
+;;       'magit-auto-revert-repository-buffer-p)
+
+;; (if (eq system-type 'windows-nt)
+;;     (progn
+;;       (setq exec-path (add-to-list 'exec-path "C:/Program Files/Git/bin"))
+;;       (setenv "PATH" (concat "C:\\Program Files\\Git\\bin;" (getenv "PATH")))))
+
+;; close git service
+(setq vc-handled-backends nil)
 
 (setq gc-cons-threshold 16777216 ; 16mb
       gc-cons-percentage 0.1)
