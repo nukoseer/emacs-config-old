@@ -1,6 +1,7 @@
 ;;; nano-theme.el
 
 ;;; Code:
+;; The original version of this theme on https://github.com/rougier/nano-emacs
 
 (unless (>= emacs-major-version 24)
   (error "The nano theme requires Emacs 24 or later!"))
