@@ -12,20 +12,27 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- ;; '(fringe-mode '(0 . 0) nil (fringe))
  '(linum-format " %5i ")
  '(package-selected-packages
    '(writeroom-mode smartscan rainbow-delimiters naysayer-theme highlight-numbers glsl-mode gcmh buffer-move aggressive-indent))
- '(rainbow-delimiters-max-face-count 1)
- )
+ '(rainbow-delimiters-max-face-count 1))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
+;;(add-to-list 'load-path "~/.emacs.d/nano-emacs/")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+
+;; (require 'nano-layout)
+
+;; (require 'nano-theme-dark)
+;; (require 'nano-faces)
+;; (nano-faces)
+;; (require 'nano-theme)
+;; (nano-theme)
+;; (require 'nano-modeline)
 
 (gcmh-mode 1)
 (window-divider-mode 1)
@@ -41,12 +48,16 @@
 (global-visual-line-mode 1)
 (global-hl-line-mode 1)
 (global-smartscan-mode 1)
+(global-so-long-mode 1)
 (add-hook 'prog-mode-hook 'highlight-numbers-mode)
 
 (run-with-idle-timer 0.2 nil (lambda ()
 			       (ido-mode 1)
-			       (setq ido-enable-flex-matching t)
-			       (setq ido-everywhere t)))
+			       (setq ido-enable-flex-matching 1)
+			       (setq ido-everywhere 1)))
+
+;; switch-to-buffer-other-window will switch vertically
+;; (setq split-width-threshold 0)
 
 (setq window-divider-default-right-width 12)
 (setq window-divider-default-places 'right-only)
@@ -59,7 +70,7 @@
 
 (setq default-frame-alist
       (append (list
-	       '(font . "Liberation Mono-12")
+	       '(font . "Liberation Mono-11.5")
 	       '(internal-border-width . 12)
 	       '(left-fringe  . 0)
                '(right-fringe . 0))))
@@ -191,8 +202,14 @@
 (global-set-key (kbd "M-<up>") 'move-line-up)
 (global-set-key (kbd "M-<down>") 'move-line-down)
 
-;; basic completation
-(global-set-key (kbd "<C-tab>") 'dabbrev-expand)
+;;(define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
+
+(add-hook
+ 'emacs-lisp-mode-hook
+ (lambda ()
+   (define-key emacs-lisp-mode-map (kbd "<tab>") 'dabbrev-expand)
+   (define-key emacs-lisp-mode-map (kbd "<C-tab>") 'indent-for-tab-command)
+   ))
 
 ;; shortcut for buffer switching
 (global-set-key (kbd "C-,") 'switch-to-buffer)
@@ -208,11 +225,18 @@
   ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
   (c-set-offset 'substatement-open 0)
   ;; other customizations can go here
-
-  (setq c++-tab-always-indent t)
+  
+  (c-set-offset 'inextern-lang 0)
+  
+  (setq c-tab-always-indent t)
   (setq c-basic-offset 4)                  ;; Default is 2
   (setq c-indent-level 4)                  ;; Default is 2
-  ;;(setq c-set-offset 'case-label 0)       ;; for switch-case
+  (c-set-offset 'case-label '+)       ;; for switch-case
+
+  (c-set-offset 'brace-list-open 0)      ;; open brace of an enum or static array list
+  (c-set-offset 'brace-list-close 0)      ;; open brace of an enum or static array list
+  (c-set-offset 'brace-list-intro '+)      ;; first line in an enum or static array list
+  (c-set-offset 'brace-list-entry 0)      ;; subsequent lines in an enum or static array
   
   (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
   (setq tab-width 4)
@@ -227,6 +251,9 @@
    ;; C-c C-c comment region (in c++ mode) (already defined)
    ;; C-c C-v uncomment region (in c++ mode)
    (local-set-key (kbd "C-c C-v") #'uncomment-region)
+   (local-set-key (kbd "<tab>") #'dabbrev-expand)
+   (local-set-key (kbd "<C-tab>") #'c-indent-line-or-region)
+   (local-set-key (kbd "C-c C-g") #'imenu)
    ;; ***_API keywords will be like noise macros (ex. __declspec(dllexport))
    ;; for correct indentation 
    (setq c-noise-macro-names "[A-Z_]+_API")   
@@ -242,6 +269,10 @@
 (defun add-todo ()
   (interactive)
   (insert "// TODO(SSJSR): "))
+
+(defun add-note ()
+  (interactive)
+  (insert "// NOTE(SSJSR): "))
 
 ;; add #if 0 #endif block
 (defun add-if0 (start end)
@@ -271,14 +302,20 @@
 (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode))
 (make-face 'font-lock-fixme-face)
 (make-face 'font-lock-note-face)
+(make-face 'font-lock-important-face)
+(make-face 'font-lock-study-face)
 (mapc (lambda (mode)
 	(font-lock-add-keywords
 	 mode
 	 '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
-           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t)
+	   ("\\<\\(IMPORTANT\\)" 1 'font-lock-important-face t)
+	   ("\\<\\(STUDY\\)" 1 'font-lock-study-face t))))
       fixme-modes)
 (modify-face 'font-lock-fixme-face "Red" nil nil t nil nil nil nil)
 (modify-face 'font-lock-note-face "Dark Green" nil nil t nil nil nil nil)
+(modify-face 'font-lock-important-face "Orange" nil nil t nil nil nil nil)
+(modify-face 'font-lock-study-face "Orange" nil nil t nil nil nil nil)
 
 ;; turn off the bell
 (defun nil-bell ())
@@ -435,7 +472,90 @@
 ;;       (setq exec-path (add-to-list 'exec-path "C:/Program Files/Git/bin"))
 ;;       (setenv "PATH" (concat "C:\\Program Files\\Git\\bin;" (getenv "PATH")))))
 
-;; close git service
+;; (defun nano-modeline-update-windows ()
+;;   "Modify the mode line depending on the presence of a window below."
+
+;;   (dolist (window (window-list))
+;;     (with-selected-window window
+;;       (if (or (one-window-p t)
+;; 	      (eq (window-in-direction 'below) (minibuffer-window))
+;; 	      (not (window-in-direction 'below)))
+;; 	  (with-current-buffer (window-buffer window)
+;; 	    (setq mode-line-format "%-"))
+;; 	(with-current-buffer (window-buffer window)
+;;  	  (setq mode-line-format nil)))
+;;       ;;      (if (window-in-direction 'above)
+;;       ;;	      (face-remap-add-relative 'header-line '(:overline "#777777"))
+;;       ;;	    (face-remap-add-relative 'header-line '(:overline nil)))
+;;       )))
+;; (add-hook 'window-configuration-change-hook 'nano-modeline-update-windows)
+
+;; (defun pulse-line (&rest _)
+;;   "Pulse the current line."
+;;   (pulse-momentary-highlight-one-line (point)))
+
+;; (dolist (command '(scroll-up-command scroll-down-command
+;; 				     recenter-top-bottom other-window))
+;;   (advice-add command :after #'pulse-line))
+
+;; (defun add-custom-keyw()
+;;   ;;adds a few special keywords for c and c++ modes"
+;;   (font-lock-add-keywords nil '(("\\<\\(global\\)" . 'font-lock-special-macro-face)
+;; 				("\\<\\(internal\\)" . 'font-lock-special-macro-face)
+;; 				("\\<\\(local_persist\\)" . 'font-lock-special-macro-face))))
+
+;; (add-hook 'c++-mode-hook 'add-custom-keyw)
+
+;; (defvar special-macro-regexp (rx bow (or "global" "internal" "local_persist") eow))
+;; (font-lock-add-keywords nil `((,special-macro-regexp . `font-lock-special-macro-face)))
+
+;; add global, internal and local_persist keywords for c/c++
+(add-hook 'c-mode-common-hook
+	  (lambda ()
+            (font-lock-add-keywords nil
+				    '(("\\<\\(global_variable\\)\\>" . font-lock-keyword-face)
+				      ("\\<\\(internal\\)\\>" . font-lock-keyword-face)
+				      ("\\<\\(local_persist\\)\\>" . font-lock-keyword-face)))))
+
+(set-variable 'grep-command "findstr -s -n -i -l ")
+
+(defun casey-find-corresponding-file ()
+  "Find the file that corresponds to this one."
+  (interactive)
+  (setq CorrespondingFileName nil)
+  (setq BaseFileName (file-name-sans-extension buffer-file-name))
+  (if (string-match "\\.c" buffer-file-name)
+      (setq CorrespondingFileName (concat BaseFileName ".h")))
+  (if (string-match "\\.h" buffer-file-name)
+      (if (file-exists-p (concat BaseFileName ".c")) (setq CorrespondingFileName (concat BaseFileName ".c"))
+	(setq CorrespondingFileName (concat BaseFileName ".cpp"))))
+  (if (string-match "\\.hin" buffer-file-name)
+      (setq CorrespondingFileName (concat BaseFileName ".cin")))
+  (if (string-match "\\.cin" buffer-file-name)
+      (setq CorrespondingFileName (concat BaseFileName ".hin")))
+  (if (string-match "\\.cpp" buffer-file-name)
+      (setq CorrespondingFileName (concat BaseFileName ".h")))
+  (if CorrespondingFileName (find-file CorrespondingFileName)
+    (error "Unable to find a corresponding file")))
+
+(defun casey-find-corresponding-file-other-window ()
+  "Find the file that corresponds to this one."
+  (interactive)
+  (find-file-other-window buffer-file-name)
+  (casey-find-corresponding-file)
+  (other-window -1))
+
+(add-hook
+ 'c++-mode-hook
+ (lambda ()
+   (local-set-key (kbd "C-x o") #'casey-find-corresponding-file)
+   (local-set-key (kbd "C-x 4 o") #'casey-find-corresponding-file-other-window)
+   ))
+
+;; (define-key c++-mode-map (kbd "C-x o") 'casey-find-corresponding-file)
+;; (define-key c++-mode-map (kbd "C-x 4 o") 'casey-find-corresponding-file-other-window)
+
+;;close git service
 (setq vc-handled-backends nil)
 
 (setq gc-cons-threshold 16777216 ; 16mb
