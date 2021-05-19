@@ -217,8 +217,8 @@
 (global-set-key (kbd "C-z") 'undo)
 
 ;; aggresive indent mode
-(global-aggressive-indent-mode 1)
-(add-to-list 'aggressive-indent-excluded-modes 'html-mode)
+;;(global-aggressive-indent-mode 1)
+;;(add-to-list 'aggressive-indent-excluded-modes 'html-mode)
 
 ;; c / c++ visual studio style code indentation
 (defun my-c-mode-common-hook ()
@@ -258,6 +258,10 @@
    ;; for correct indentation 
    (setq c-noise-macro-names "[A-Z_]+_API")   
    ))
+
+(defun my-imenu-rescan ()
+  (interactive)
+  (imenu--menubar-select imenu--rescan-item))
 
 ;; disable auto save mode
 (setq auto-save-default nil)
