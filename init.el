@@ -14,7 +14,7 @@
  ;; If there is more than one, they won't work right.
  '(linum-format " %5i ")
  '(package-selected-packages
-   '(writeroom-mode smartscan rainbow-delimiters naysayer-theme highlight-numbers glsl-mode gcmh buffer-move aggressive-indent))
+   '(lsp-dart writeroom-mode smartscan rainbow-delimiters naysayer-theme highlight-numbers glsl-mode gcmh buffer-move))
  '(rainbow-delimiters-max-face-count 1))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -232,6 +232,7 @@
   (setq c-basic-offset 4)                  ;; Default is 2
   (setq c-indent-level 4)                  ;; Default is 2
   (c-set-offset 'case-label '+)       ;; for switch-case
+  (c-set-offset 'statement-case-intro 0)
 
   (c-set-offset 'brace-list-open 0)      ;; open brace of an enum or static array list
   (c-set-offset 'brace-list-close 0)      ;; open brace of an enum or static array list
@@ -256,7 +257,9 @@
    (local-set-key (kbd "C-c C-g") #'imenu)
    ;; ***_API keywords will be like noise macros (ex. __declspec(dllexport))
    ;; for correct indentation 
-   (setq c-noise-macro-names "[A-Z_]+_API")   
+   (setq c-noise-macro-names "[A-Z_]+_API")
+   ;(setq c-macro-names-with-semicolon
+   ;'("INVALID_DEFAULT_CASE"))
    ))
 
 (defun my-imenu-rescan ()
@@ -272,11 +275,11 @@
 ;; add todo function
 (defun add-todo ()
   (interactive)
-  (insert "// TODO(SSJSR): "))
+  (insert "// TODO: "))
 
 (defun add-note ()
   (interactive)
-  (insert "// NOTE(SSJSR): "))
+  (insert "// NOTE: "))
 
 ;; add #if 0 #endif block
 (defun add-if0 (start end)
@@ -303,7 +306,7 @@
 	    (kill-whole-line)))))
 
 ;; highlighting for TODO and NOTE
-(setq fixme-modes '(c++-mode c-mode emacs-lisp-mode))
+(setq fixme-modes '(c++-mode c-mode emacs-lisp-mode dart-mode))
 (make-face 'font-lock-fixme-face)
 (make-face 'font-lock-note-face)
 (make-face 'font-lock-important-face)
@@ -556,6 +559,9 @@
    (local-set-key (kbd "C-x 4 o") #'casey-find-corresponding-file-other-window)
    ))
 
+
+(global-set-key (kbd "C-x C-c") 'nil)
+(global-set-key (kbd "<M-f4>") 'save-buffers-kill-terminal)
 ;; (define-key c++-mode-map (kbd "C-x o") 'casey-find-corresponding-file)
 ;; (define-key c++-mode-map (kbd "C-x 4 o") 'casey-find-corresponding-file-other-window)
 
