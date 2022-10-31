@@ -12,9 +12,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(grep-use-null-device nil)
  '(linum-format " %5i ")
  '(package-selected-packages
-   '(lsp-dart writeroom-mode smartscan rainbow-delimiters naysayer-theme highlight-numbers glsl-mode gcmh buffer-move))
+   '(expand-region yasnippet dumb-jump writeroom-mode smartscan rainbow-delimiters naysayer-theme highlight-numbers glsl-mode gcmh buffer-move))
  '(rainbow-delimiters-max-face-count 1))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -34,8 +35,11 @@
 ;; (nano-theme)
 ;; (require 'nano-modeline)
 
+;; theme
+(setq custom--inhibit-theme-enable nil)
+(load-theme 'nano t)
+
 (gcmh-mode 1)
-(window-divider-mode 1)
 (menu-bar-mode 0)
 (scroll-bar-mode 0)
 (tool-bar-mode 0)
@@ -49,7 +53,10 @@
 (global-hl-line-mode 1)
 (global-smartscan-mode 1)
 (global-so-long-mode 1)
+(yas-global-mode 1)
 (add-hook 'prog-mode-hook 'highlight-numbers-mode)
+
+(global-set-key (kbd "C-=") 'er/expand-region)
 
 (run-with-idle-timer 0.2 nil (lambda ()
 			       (ido-mode 1)
@@ -57,10 +64,12 @@
 			       (setq ido-everywhere 1)))
 
 ;; switch-to-buffer-other-window will switch vertically
-;; (setq split-width-threshold 0)
+(setq split-width-threshold nil)
+(setq split-height-threshold 200)
 
-(setq window-divider-default-right-width 12)
 (setq window-divider-default-places 'right-only)
+;;(setq window-divider-default-right-width 12)
+(window-divider-mode 1)
 
 ;; no ugly button for checkboxes
 (setq widget-image-enable nil)
@@ -70,11 +79,10 @@
 
 (setq default-frame-alist
       (append (list
-	       '(font . "Liberation Mono-11.5")
-	       '(internal-border-width . 12)
-	       '(left-fringe  . 0)
-               '(right-fringe . 0))))
-
+	       '(font . "Liberation Mono-11.5") ;; PxPlus ToshibaSat 8x16:pixelsize=16:dpi=96:autohint=false:hinting=false:antialias=standard
+	       '(internal-border-width . 0)
+	       '(left-fringe  . 12)
+               '(right-fringe . 12))))
 
 ;; force emacs for utf-8
 (set-language-environment "UTF-8")
@@ -96,7 +104,7 @@
 (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))
 
 ;; set default directory to c++ folder
-(setq default-directory "D:/Programming/c&cpp/cpp" )
+(setq default-directory "D:/Programming/c_cpp/cpp" )
 
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -105,10 +113,6 @@
                              (float-time
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)))
-
-;; theme
-(setq custom--inhibit-theme-enable nil)
-(load-theme 'nano t)
 
 ;; activate fullscreen, open empty buffer and init.el
 (defun start-up-screen ()
@@ -204,15 +208,18 @@
 
 ;;(define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
 
+(global-set-key (kbd "<tab>") 'hippie-expand)
+
 (add-hook
  'emacs-lisp-mode-hook
  (lambda ()
-   (define-key emacs-lisp-mode-map (kbd "<tab>") 'dabbrev-expand)
+   ;;(define-key emacs-lisp-mode-map (kbd "<tab>") 'dabbrev-expand)
    (define-key emacs-lisp-mode-map (kbd "<C-tab>") 'indent-for-tab-command)
    ))
 
 ;; shortcut for buffer switching
-(global-set-key (kbd "C-,") 'switch-to-buffer)
+;;(global-set-key (kbd "C-,") 'switch-to-buffer)
+(global-set-key (kbd "C-'") 'switch-to-buffer)
 (global-set-key (kbd "C-;") 'switch-to-buffer-other-window)
 (global-set-key (kbd "C-z") 'undo)
 
@@ -224,6 +231,7 @@
 (defun my-c-mode-common-hook ()
   ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
   (c-set-offset 'substatement-open 0)
+  (c-set-offset 'statement-cont 0)
   ;; other customizations can go here
   
   (c-set-offset 'inextern-lang 0)
@@ -233,6 +241,7 @@
   (setq c-indent-level 4)                  ;; Default is 2
   (c-set-offset 'case-label '+)       ;; for switch-case
   (c-set-offset 'statement-case-intro 0)
+  (c-set-offset 'statement-case-open 0)
 
   (c-set-offset 'brace-list-open 0)      ;; open brace of an enum or static array list
   (c-set-offset 'brace-list-close 0)      ;; open brace of an enum or static array list
@@ -241,7 +250,7 @@
   
   (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
   (setq tab-width 4)
-  (setq indent-tabs-mode t)  ; use spaces only if nil
+  (setq indent-tabs-mode nil)  ; use spaces only if nil
   )
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
@@ -252,7 +261,7 @@
    ;; C-c C-c comment region (in c++ mode) (already defined)
    ;; C-c C-v uncomment region (in c++ mode)
    (local-set-key (kbd "C-c C-v") #'uncomment-region)
-   (local-set-key (kbd "<tab>") #'dabbrev-expand)
+   ;;(local-set-key (kbd "<tab>") #'dabbrev-expand)
    (local-set-key (kbd "<C-tab>") #'c-indent-line-or-region)
    (local-set-key (kbd "C-c C-g") #'imenu)
    ;; ***_API keywords will be like noise macros (ex. __declspec(dllexport))
@@ -260,6 +269,17 @@
    (setq c-noise-macro-names "[A-Z_]+_API")
    ;(setq c-macro-names-with-semicolon
    ;'("INVALID_DEFAULT_CASE"))
+   ))
+
+(add-hook
+ 'python-mode-hook
+ (lambda ()
+
+   (local-set-key (kbd "C-c C-c") #'comment-region)
+   (local-set-key (kbd "C-c C-v") #'uncomment-region)
+   ;;(local-set-key (kbd "<tab>") #'dabbrev-expand)
+   (local-set-key (kbd "<C-tab>") #'c-indent-line-or-region)
+   (local-set-key (kbd "C-c C-g") #'imenu)
    ))
 
 (defun my-imenu-rescan ()
@@ -441,7 +461,9 @@
   This is the same as using \\[set-mark-command] with the prefix argument."
   (interactive)
   (set-mark-command 1))
-(global-set-key (kbd "M-\"") 'jump-to-mark)
+
+;;(global-set-key (kbd "M-\"") 'jump-to-mark)
+(global-set-key (kbd "M-`") 'jump-to-mark)
 
 ;; C-n adds new line if it is end of the buffer
 (setq next-line-add-newlines t)
@@ -524,26 +546,109 @@
 				      ("\\<\\(internal\\)\\>" . font-lock-keyword-face)
 				      ("\\<\\(local_persist\\)\\>" . font-lock-keyword-face)))))
 
-(set-variable 'grep-command "findstr -s -n -i -l ")
+;;(set-variable 'grep-command "findstr -s -n -i -l ")
+
+(set-variable 'grep-command "rg --pcre2 -H --no-heading -n -S -e ")
+ (grep-apply-setting
+   'grep-find-command
+   '("rg --pcre2 -H --no-heading -n -S -e \"\" ./ " . 38)
+ )
+
+;; (defun casey-find-corresponding-file ()
+;;   "Find the file that corresponds to this one."
+;;   (interactive)
+;;   (setq CorrespondingFileName nil)
+;;   (setq BaseFileName (file-name-sans-extension buffer-file-name))
+;;   (if (string-match "\\.c" buffer-file-name)
+;;       (setq CorrespondingFileName (concat BaseFileName ".h")))
+;;   (if (string-match "\\.h" buffer-file-name)
+;;       (if (file-exists-p (concat BaseFileName ".c")) (setq CorrespondingFileName (concat BaseFileName ".c"))
+;; 	(setq CorrespondingFileName (concat BaseFileName ".cpp"))))
+;;   (if (string-match "\\.hin" buffer-file-name)
+;;       (setq CorrespondingFileName (concat BaseFileName ".cin")))
+;;   (if (string-match "\\.cin" buffer-file-name)
+;;       (setq CorrespondingFileName (concat BaseFileName ".hin")))
+;;   (if (string-match "\\.cpp" buffer-file-name)
+;;       (setq CorrespondingFileName (concat BaseFileName ".h")))
+;;   (if CorrespondingFileName (find-file CorrespondingFileName)
+;;     (error "Unable to find a corresponding file")))
 
 (defun casey-find-corresponding-file ()
   "Find the file that corresponds to this one."
   (interactive)
-  (setq CorrespondingFileName nil)
   (setq BaseFileName (file-name-sans-extension buffer-file-name))
+  (setq FileExtension nil)
   (if (string-match "\\.c" buffer-file-name)
-      (setq CorrespondingFileName (concat BaseFileName ".h")))
+      (setq FileExtension ".h"))
   (if (string-match "\\.h" buffer-file-name)
-      (if (file-exists-p (concat BaseFileName ".c")) (setq CorrespondingFileName (concat BaseFileName ".c"))
-	(setq CorrespondingFileName (concat BaseFileName ".cpp"))))
+      (if (file-exists-p (concat BaseFileName ".c")) (setq FileExtension ".c")
+	(setq FileExtension ".cpp")))
   (if (string-match "\\.hin" buffer-file-name)
-      (setq CorrespondingFileName (concat BaseFileName ".cin")))
+      (setq FileExtension ".cin"))
   (if (string-match "\\.cin" buffer-file-name)
-      (setq CorrespondingFileName (concat BaseFileName ".hin")))
+      (setq FileExtension ".hin"))
   (if (string-match "\\.cpp" buffer-file-name)
-      (setq CorrespondingFileName (concat BaseFileName ".h")))
-  (if CorrespondingFileName (find-file CorrespondingFileName)
-    (error "Unable to find a corresponding file")))
+      (setq FileExtension ".h"))
+
+  (setq DefDirectory default-directory)
+  (setq BaseFileName (file-name-sans-extension buffer-file-name))
+  (setq NonDirectory (file-name-nondirectory BaseFileName))
+  (setq CorrespondingFileName (concat DefDirectory NonDirectory FileExtension))
+
+  (if (string-match ".h" FileExtension)
+      (if (file-exists-p CorrespondingFileName)
+	  (find-file CorrespondingFileName)
+	(setq CorrespondingFileName (concat DefDirectory "inc/" NonDirectory FileExtension))
+	(if (file-exists-p CorrespondingFileName)
+	    (find-file CorrespondingFileName)
+	  (setq CorrespondingFileName (concat DefDirectory "include/" NonDirectory FileExtension))
+	  (if (file-exists-p CorrespondingFileName)
+	      (find-file CorrespondingFileName)
+	    (setq CorrespondingFileName (concat DefDirectory "includes/" NonDirectory FileExtension))
+	    (if (file-exists-p CorrespondingFileName)
+		(find-file CorrespondingFileName)
+	      (setq CorrespondingFileName (concat DefDirectory "../" NonDirectory FileExtension))
+	      (if (file-exists-p CorrespondingFileName)
+		  (find-file CorrespondingFileName)
+		(setq CorrespondingFileName (concat DefDirectory "../inc/" NonDirectory FileExtension))
+		(if (file-exists-p CorrespondingFileName)
+		    (find-file CorrespondingFileName)
+		  (setq CorrespondingFileName (concat DefDirectory "../include/" NonDirectory FileExtension))
+		  (if (file-exists-p CorrespondingFileName)
+		      (find-file CorrespondingFileName)
+		    (setq CorrespondingFileName (concat DefDirectory "../includes/" NonDirectory FileExtension))
+		    (if (file-exists-p CorrespondingFileName)
+			(find-file CorrespondingFileName)
+		      (error "Unable to find a corresponding file")))))))))
+    (setq CorrespondingFileName (concat DefDirectory "../" NonDirectory FileExtension))
+    (if (file-exists-p CorrespondingFileName)
+	(find-file CorrespondingFileName)
+      (setq CorrespondingFileName (concat DefDirectory "../src/" NonDirectory FileExtension))
+      (if (file-exists-p CorrespondingFileName)
+	  (find-file CorrespondingFileName)
+	(setq CorrespondingFileName (concat DefDirectory "../source/" NonDirectory FileExtension))
+	(if (file-exists-p CorrespondingFileName)
+	    (find-file CorrespondingFileName)
+	  (setq CorrespondingFileName (concat DefDirectory "../sources/" NonDirectory FileExtension))
+	  (if (file-exists-p CorrespondingFileName)
+	      (find-file CorrespondingFileName)
+	    (if (string-match ".c" FileExtension)
+		(setq FileExtension ".c")
+	      (setq FileExtension ".cpp"))
+	    (setq CorrespondingFileName (concat DefDirectory "../" NonDirectory FileExtension))
+	    (if (file-exists-p CorrespondingFileName)
+		(find-file CorrespondingFileName)
+	      (setq CorrespondingFileName (concat DefDirectory "../src/" NonDirectory FileExtension))
+	      (if (file-exists-p CorrespondingFileName)
+		  (find-file CorrespondingFileName)
+		(setq CorrespondingFileName (concat DefDirectory "../source/" NonDirectory FileExtension))
+		(if (file-exists-p CorrespondingFileName)
+		    (find-file CorrespondingFileName)
+		  (setq CorrespondingFileName (concat DefDirectory "../sources/" NonDirectory FileExtension))
+		  (if (file-exists-p CorrespondingFileName)
+		      (find-file CorrespondingFileName)
+		    (error "Unable to find a corresponding file")))))))))))
+    
 
 (defun casey-find-corresponding-file-other-window ()
   "Find the file that corresponds to this one."
@@ -560,10 +665,46 @@
    ))
 
 
-(global-set-key (kbd "C-x C-c") 'nil)
+(global-set-key (kbd "C-x C-c") 'grep-find)
 (global-set-key (kbd "<M-f4>") 'save-buffers-kill-terminal)
 ;; (define-key c++-mode-map (kbd "C-x o") 'casey-find-corresponding-file)
 ;; (define-key c++-mode-map (kbd "C-x 4 o") 'casey-find-corresponding-file-other-window)
+
+(setq dumb-jump-force-searcher 'rg)
+(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+;(setq xref-show-definitions-function #'xref-show-definitions-completing-read)
+
+;; (find-library xref)
+;; We override these 2 functions to prevent pulsing after jumps.
+(defcustom xref-after-jump-hook '(recenter)
+  "Functions called after jumping to an xref." )
+(defcustom xref-after-return-hook '()
+  "Functions called after returning to a pre-jump location.")
+
+;; M-s o Occur
+
+;; Ubuntu like emacs colors for nano theme
+;; (setq nano-color-foreground "#ECEFF4")
+;; (setq nano-color-background "#300A24")
+;; (setq nano-color-highlight  "#3D1836")
+;; (setq nano-color-critical   "#EBCB8B")
+;; (setq nano-color-salient    "#BA7BA6")
+;; (setq nano-color-strong     "#ECEFF4")
+;; (setq nano-color-popout     "#D08770")
+;; (setq nano-color-subtle     "#5E4356")
+;; (setq nano-color-faded      "#785065")
+
+(global-auto-revert-mode)
+
+;; describe-char to learn face of the char cursor stands on (maybe also describe-face, customize-face, customize-group)
+;; C-M-h mark function
+
+(ignore-errors
+  (require 'ansi-color)
+  (defun my-colorize-compilation-buffer ()
+    (when (eq major-mode 'compilation-mode)
+      (ansi-color-apply-on-region compilation-filter-start (point-max))))
+  (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
 
 ;;close git service
 (setq vc-handled-backends nil)
